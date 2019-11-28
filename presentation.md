@@ -215,7 +215,7 @@ as a result, each state machine processes the same series of commands and thus p
 the raft protocol is based on the same set of assumptions as classic multi paxos:
 
 * asynchronicity: no upper bound on message delays or computation times and no global clock synchronization.
-* unreliable Links: possibility of indefinite networks delays, packet loss, partitions, reordering, or duplication of messages.
+* unreliable links: possibility of indefinite networks delays, packet loss, partitions, reordering, or duplication of messages.
 * fail crash failure model: processes may crash, may eventually recover, and in that case rejoin the protocol, byzantine failures cannot occur.
 
 strong leadership extends classical leader-driven consensus by adding the following constraints:
@@ -239,14 +239,66 @@ The moment a leader decides an entry is committed, it is from then on guaranteed
 
 as you wish magic cow :)
 
+
 -------------------------------------------------
 
 -> # Consul  <-
+
+soooo how does this affect consul, what the hell has all of this to do with the theme of this talk?!
+
+well, it is important to know what you are doing isnt it ?
+
+what does consul as a system consist of ?
+* consul has 2 modes (server and agent)
+* we have the 3 states raft describes also there (leader,candidate,follower)
+
+so does that mean every node in consul participates in raft ? noooo by far :D
+only servers are members of the raft consensus
+
+where does that leave agents?
+agents and servers are using a gossip protocol to manage membership and broadcast messages to the cluster
+
+but then where does that leave us in terms of consistency ? anybody an idea ?
+
 
 -------------------------------------------------
 
 -> # Zookeeper  <-
 
+zookeeper is a pretty similar beast with the excaption that we use here a protocol called ZAB under the hood
+this is pretty similar to both raft and paxos as they are influenced partly by each other
+
+zookeeper also uses the same primitives of states
+
+but then where are the differences ???
+
+where does that leave us in terms of consistency ? anybody an idea ?
+are we Lineralizable ? Serializable ? Strict Serializable ? something else ?
+
 -------------------------------------------------
 
--> #   <-
+-> # Postgres  <-
+
+how the hell did we end up then at postgres ?? what the hell has postgres to do with a consensus system ??
+
+lets take the following examples
+* we have a postgres server standing alone
+* now additionally image you have a client connected to the server
+
+
+are we always consistent in both cases ? think about it
+
+A network partition–and indeed, most network errors–doesn’t mean a failure.
+It means the absence of information.
+Without a partition-tolerant commit protocol, like extended three-phase commit, we cannot assert the state of the system for these writes
+
+-------------------------------------------------
+
+-> # Famous last words ^^  <-
+
+< muuuuuuh >
+        \\   ^__^
+         \\  (oo)\_______
+            (__)\       )\/\
+                ||----w |
+                ||     ||
